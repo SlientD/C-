@@ -1,2 +1,2 @@
-# C-
+# CPP
 learn c++ and practice
