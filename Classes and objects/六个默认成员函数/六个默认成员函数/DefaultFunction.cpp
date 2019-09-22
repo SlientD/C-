@@ -8,7 +8,7 @@
 using namespace std;
 
 
-#if 0
+#if 1
 class Date
 {
 };
@@ -111,6 +111,85 @@ private:
 //因而对于自定义类型的成员变量，默认构造函数还是起作用的，而对于内置类型，默认构造函数就是赋了个随机值，需要自己写个构造函数，来给初始值
 
 
+//1.4构造函数初始化：在以上构造函数的介绍中，构造函数的作用只是赋初值，赋值可以赋很多次，但是初始化只能在对象创建时初始化一次
+// 初始化列表作用：初始化类中的成员变量，并且每个成员变量只能在初始化列表中出现一次
+class Time4{
+
+public:
+	Time4(int hour=0,int minute=0,int second=0)
+		:_hour(hour)
+		, _minute(minute)
+		, _second(second)
+	{
+	}
+
+
+
+private:
+	int _hour;
+	int _minute;
+	int _second;
+
+
+
+
+};
+
+class Date4
+{
+public:
+	Date4(int year, int month, int day)
+		: _year(year)             //在此处给出初始化列表，给每个变量初始化，每个成员变量在初始化列表中只能出现一次因为初始化只能初始化一次
+		, _month(month)
+		, _day(day)
+		, a(10)           //此处a虽然是const值，但是初始化还是可以给值的
+		, b(_year)
+		, _t(19, 24, 30)
+		//在 构造函数体中：赋初值
+	{
+		
+		/*_year = year;
+		_month = month;
+		_day = day;
+		//a = 10;                //不可以赋值的
+		*/
+	}
+
+private:
+	int _year;
+	int _month;
+	int _day;
+
+	const int a;
+	int& b;
+	Time4 _t;
+};
+//const成员变量-a，引用成员变量-b，类类型成员-t（该类没有默认构造函数）类中如果包含以下成员，必须放在初始化列表位置进行初始化
+
+//Q1.5.1成员变量在类中声明次序就是其在初始化列表中的初始化顺序，预期在初始化列表中的先后次序无关
+
+class Date5
+{
+public:
+	Date5(int year,int day)
+		: _year(year)
+		, _day(day)
+		, _month(_day)       //此处_month是随机值，因为是按声明赋值的，此处_day还没有赋值
+	{
+		cout << this <<_year<<_month<<_day<< endl;
+
+	}
+
+
+private:
+	int _year;
+	int _month;
+	int _day;
+};
+// 所以建议：尽量不要使用成员初始化成员
+//      初始化列表中成员的出现次序最好与其在类中的声明次序保持一致
+
+
 void TestDate1()
 {
 	Date1 d11;                   //没有定义构造函数，对象也能创建成功，说明此处调用了我们没有写的编译器自动生成的一个无参的默认构造函数
@@ -125,6 +204,8 @@ void TestDate1()
 	// 注意：如果通过无参构造函数创建对象时，对象后面不用跟括号，否则就成了函数声明
 
 	Date3 d31;       
+	Date4 d41(2011,10,21);
+	Date5 d51(2019,9);
 }
 #endif
 
@@ -243,7 +324,7 @@ void TestDate3()
 }
 #endif
 
-
+#if 0
 //4.运算符重载：若想实现两个对象进行加减，肯定不能直接操作，所以可用函数来对对象中的成员变量进行操作。但是每次调函数代码的可读性会很差
 //C++为了增强代码的可读性引入了运算符重载，运算符重载是具有特殊函数名的函数，也具有其返回值类型，函数名字以及参数列表，其返回值类型与参数列表与普通的函数类似。
 //函数名字为：关键字operator后面接需要重载的运算符符号。 函数原型：返回值类型 operator操作符(参数列表)
@@ -463,7 +544,7 @@ public:
     
 
 
-//Q1
+//Q4.1
 //该函数的效果和isEqual相同，这个函数在使用时可以直接使两个date对象x==y来实现判等
 //bool operator== (const Date& x, const Date& y)   
 //{
@@ -495,18 +576,20 @@ void TestDate4()
 	int t = d5 - d1;
 	cout << t << endl;
 }
+#endif
+
 int main()
 {
 	
 	
-	//TestDate1();
+	TestDate1();
 
 
 	//TestDate2();
 	//_CrtDumpMemoryLeaks();  查看内存泄露问题
 
 	//TestDate3();
-	TestDate4();
+	//TestDate4();
 	system("pause");
 	return 0;
 }
