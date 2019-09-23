@@ -189,6 +189,37 @@ private:
 // 所以建议：尽量不要使用成员初始化成员
 //      初始化列表中成员的出现次序最好与其在类中的声明次序保持一致
 
+//Q1.6 此处引入一个explicit关键字
+//说明：因为构造函数不仅可以构造与初始化对象，对于单个参数的构造函数，还具有类型转换的作用。比如
+class Date6
+{
+public:
+	Date6(int year)
+		: _year(year)
+		
+	{
+		cout << this << _year  << endl;
+	}
+
+
+private:
+	int _year;
+};
+class Date7
+{
+public:
+	explicit Date7(int year)
+		: _year(year)
+
+	{
+		cout << this << _year << endl;
+	}
+
+
+private:
+	int _year;
+};
+
 
 void TestDate1()
 {
@@ -206,6 +237,15 @@ void TestDate1()
 	Date3 d31;       
 	Date4 d41(2011,10,21);
 	Date5 d51(2019,9);
+
+	//Q6:用一个整形变量给日期类型对象赋值,实际编译器背后会用2019构造一个无名对象，最后用无名对象给d6对象进行赋值
+	Date6 d6(2018);
+	d6 = 2019;
+	//但是如果这样写，会给人一种d6是变量的感觉，降低了代码的可读性，所以我们要防止单参构造函数的隐式转换。因而引入explicit
+	//用法：在函数前加explicit修饰构造函数，将会禁止单参构造函数的隐式转换。注：该关键字修饰单参构造函数才有意义
+	Date7 d7(2018);
+	//d7 = 2019;   //此处会报错
+	
 }
 #endif
 
