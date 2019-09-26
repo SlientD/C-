@@ -29,7 +29,7 @@ int main(){
 }
 #endif
 
-#if 0
+#if 1
 //Q2：注：new与delete要配对使用，new创建free释放，malloc创建和delete释放，有些时候会出错
 
 
@@ -70,7 +70,7 @@ public:
 
 	~A()
 	{
-		delete _p;
+		delete _p;                    //注意：在析构函数中不要放 delete 一个本类类对象， 否则会进入死循环，因为delete一下，进入这个析构，一进又delete再进，，，
 		cout << "~Test():" << this << endl;
 	}
 
@@ -100,7 +100,7 @@ void Test2()
 
 	A* p5 = new A[10];
 	A* p6 = new A[10];
-	free(p5);
+	delete p5;           //会崩掉
 	delete[] p6;
 }
 
@@ -254,6 +254,7 @@ int main()
 }
 #endif
 
+#if 0
 
 //设计一个类，只能在堆上创建对象
 //方法：将构造函数和拷贝构造函数定义为私有的(禁止通过默认构造函数来创建对象)，防止其他函数在栈上生成对象。然后在类中提供一个静态成员函数，在该静态成员函数上完成堆对象的创建
@@ -292,3 +293,4 @@ int main(){
 	system("pause");
 	return 0;
 }
+#endif
