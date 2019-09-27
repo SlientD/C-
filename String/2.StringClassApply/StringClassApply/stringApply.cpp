@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include <iostream>
 #include <string>
+#include <math.h>
 using namespace std;
 
 //Q1:
@@ -43,6 +44,23 @@ string LastWord(const string &str)         //不可返回引用，因为s是临时变量，函数
 {
 	string s = str.substr(str.rfind(' ') + 1);
 	return s;
+}
+
+//Q4:
+bool JudgePlalin(string str)
+{
+	size_t start = 0;
+	size_t end = str.size() - 1;
+	while (start < end)
+	{
+		if (str[start] != str[end] && abs(str[start] - str[end])!=32)
+		{
+			return false;
+		}
+		start++;
+		end--;
+	}
+	return true;
 }
 
 //Q5:法一：
@@ -165,18 +183,33 @@ int main()
 	cout << c << endl;
 	cout << endl;
 
-	//Q3:字符串里面最后一个单词的长度
-	cout << "Q3:字符串里面最后一个单词的长度" << endl;
-	string s3;
+	////Q3:字符串里面最后一个单词的长度
+	//cout << "Q3:字符串里面最后一个单词的长度" << endl;
+	//string s3;
 
-	while (getline(cin,s3))      //循环输入，  不要用cin 因为cin遇见空格就停止了。但getline读取的是一行
-		                         //^Z可以停止  但影响了下一个cin的使用？？？怎么解决
+	//while (getline(cin,s3))      //循环输入，  不要用cin 因为cin遇见空格就停止了。但getline读取的是一行
+	//	                         //^Z可以停止  但影响了下一个cin的使用？？？怎么解决
+	//{
+	//	cout << LastWord(s3) << endl;
+	//}
+	
+	
+	
+	//Q4:验证一个字符串是不是回文，不区分大小写
+	cout << "Q4:验证一个字符串是不是回文" << endl;
+	string s4;
+	while (getline(cin, s4))
 	{
-		cout << LastWord(s3) << endl;
+		if (JudgePlalin(s4))
+		{
+			cout << "the string is plalindrome" << endl;
+		}
+		else{
+			cout << "the string is not plalindrome" << endl;
+		}
 	}
 	
-	
-	//Q4:验证一个字符串是不是回文
+    
 
 
 	//Q5:字符串相加
