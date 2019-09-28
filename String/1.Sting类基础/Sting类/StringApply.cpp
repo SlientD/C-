@@ -222,8 +222,9 @@ void Test4()
 
 	cout << s.c_str() << endl;     //c_str返回C格式字符串
 
+	cout << "!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 	//find + npos(可省，默认从开始找) 从字符串pos位置开始往后找字符c/字符串s，返回该字符在字符串/s首元素在字符串在中的位置(下标)
-	cout << s.find('h') << endl;
+	cout << s.find('[') << endl;
 	cout << s.find('h', 3) << endl;
 	cout << s.find("hello") << endl;
 	cout << s.find("hello",2) << endl;
@@ -265,7 +266,7 @@ void Test4()
 int main()
 {
 
-	Test2();
+	Test4();
 
 	system("pause");
 	return 0;
