@@ -1,71 +1,10 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include <iostream>
 #include <string>
+#include <assert.h>
 using namespace std;
 
-//自定义类型不能拷贝构造时，不能用默认拷贝构造函数，因为是浅拷贝只是将地址给了对方指向了同一块空间
-//深拷贝
-namespace String1{
-	class string{
-	public:
-		string(char *s =""){
-			if (s == nullptr)
-			{
-				s = "";
-			}
-			_str = new char[strlen(s) + 1];
-			strcpy(_str, s);
-		}
-		/*string(const string &s)
-		{
-			_str = new char[strlen(s._str) + 1];
-			strcpy(_str, s._str);
-		}*/
-		//现代版写法String类
-		string(const string &s)
-			:_str(nullptr)               //为什么要初始化：要保证交换完后，stmp不会指向一段无效空间，stmp析构的时候不会报错
-		{
-		string stmp(s._str);            //stmp在这个函数调完之后会自己调用析构函数释放
-		swap(_str,stmp._str);  
-		}
-		
-		~string()
-		{
-			delete[] _str;
-			_str = nullptr;
-		}
-
-		/*string& operator=(const string &s)
-		{
-			if (this == &s)
-			{
-				return *this;
-			}
-			delete[] _str;
-			_str = new char[strlen(s._str) + 1];
-			strcpy(_str, s._str);
-			return *this;
-
-		}*/
-		string& operator=(string s)
-		{
-			swap(_str, s._str);
-			return *this;
-
-		}
-
-
-		friend ostream& operator<<(ostream &_cout, const string &str);
-		
-	private:
-		char *_str;
-	};
-	ostream& operator<<(ostream &_cout, const string &str)
-	{
-		_cout << str._str;                    //_cout就是cout
-		return _cout;
-	}
-}
+#if 0
 //浅拷贝:
 //思考为什么之前浅拷贝会出现错误？因为浅拷贝只是将地址给了对方指向了同一块空间，在调用析构函数时，同一块空间会出现被多次释放的情况，因而会报错
 //但是并不代表多个对象就无法共享一份资源空间，只要保证该资源空间只被释放一次即可。
@@ -105,7 +44,7 @@ namespace String2
 
 		// s2 = s1;
 		string& operator=(const string& str)
-		{ 
+		{
 			if (this == &str)
 			{
 				return *this;
@@ -116,7 +55,7 @@ namespace String2
 				_str = nullptr;
 			}
 			_str = str._str;
-			
+
 			++count;
 
 			return *this;
@@ -150,6 +89,7 @@ namespace String2
 
 namespace String3{
 	class string{
+
 	public:
 		string(char *s = "")
 			:count(new int(1))
@@ -184,10 +124,10 @@ namespace String3{
 			count = str.count;          //换指向，改计数器
 			++(*count);
 			return *this;
-			
+
 
 		}
-		
+
 		~string()
 		{
 			if (_str&&--(*count) == 0)     //不是还未初始化的，然后是最后一个用该空间的对象
@@ -200,37 +140,327 @@ namespace String3{
 			}
 		}
 		friend	ostream& operator<<(ostream &_cout, const string &str);
+
+
+
+
+
+
 	private:
 		char *_str;
 		int *count;
 	};
 	ostream& operator<<(ostream &_cout, const string &str)
 	{
-		_cout << str._str<<":"<<*str.count;                    //_cout就是cout
+		_cout << str._str << ":" << *str.count;                    //_cout就是cout
 		return _cout;
 	}
 }
 
-void Test(const String3::string &str)
+#endif
+//自定义类型不能拷贝构造时，不能用默认拷贝构造函数，因为是浅拷贝只是将地址给了对方指向了同一块空间
+//深拷贝
+namespace String1{
+	class string{
+	public:
+		typedef char* iterator;
+		string(char *s ="")     //包涵了无参构造
+		{
+			if (s == nullptr)
+			{
+				s = "";
+			}
+			_str = new char[strlen(s) + 1];
+			resize(strlen(s));
+			strcpy(_str, s);
+			
+		}
+		/*string(const string &s)
+		{
+			_str = new char[strlen(s._str) + 1];
+			strcpy(_str, s._str);
+		}*/
+		//现代版写法String类
+		string(const string &s)
+			:_str(nullptr)               //为什么要初始化：要保证交换完后，stmp不会指向一段无效空间，stmp析构的时候不会报错
+		{
+		string stmp(s._str);            //stmp在这个函数调完之后会自己调用析构函数释放
+		swap(_str,stmp._str);
+		_size = s._size;
+		_capacity = s._capacity;
+		}
+		string(size_t n, char ch)
+		{
+			_str = new char[n];
+			memset(_str, ch, n);
+			resize(n);
+			
+		}
+		~string()
+		{
+			delete[] _str;
+			_str = nullptr;
+		}
+
+		/*string& operator=(const string &s)
+		{
+			if (this == &s)
+			{
+				return *this;
+			}
+			delete[] _str;
+			_str = new char[strlen(s._str) + 1];
+			strcpy(_str, s._str);
+			return *this;
+
+		}*/
+		string& operator=(string s)
+		{
+			swap(_str, s._str);
+			_size = s._size;
+			_capacity = s._capacity;
+			return *this;
+
+		}
+
+
+		friend ostream& operator<<(ostream &_cout, const string &str);
+
+		
+
+		//容量操作
+		size_t size()
+		{
+			return _size;
+		}
+		size_t capacity()
+		{
+			return _capacity;
+		}
+		bool isEmpty()
+		{
+			if (_size <= 0)
+			{
+				return true;
+			}
+			else{
+				return false;
+			}
+			
+		}
+		void clear()
+		{
+			_size = 0;
+			_str[_size] = '\0';
+		}
+		void reserve(size_t newcap)
+		{
+			while (newcap>_capacity)
+			{
+				_capacity = size_t(1.5*_capacity);
+			}
+
+			char *str = new char[_capacity+1];       //capacity,size不包括字符串中的\0,所以实际的空间要加1
+			strcpy(str, _str);
+			swap(str,_str);
+		}
+		void resize(size_t newsize,char ch='\0')
+		{
+			if (newsize>_size){
+				if (newsize > _capacity)
+				{
+					reserve(newsize);
+				}
+				memset(_str + _size, ch, newsize - _size);
+					
+			}
+			
+			_size = newsize;
+			_str[newsize] = '\0';	
+		}
+		//访问、遍历
+		const char operator[](size_t index)const
+		{
+			assert(index < _size&&index >= 0);
+			return _str[index];
+		}
+		char *c_str()
+		{
+
+			return _str;
+		}
+		//迭代器：
+		iterator begin(){
+			return _str;
+		}
+		iterator end(){
+			return _str + _size;
+		}
+		//迭代器范围，[begin,end）   左闭右开
+
+		//修改操作
+		void push_back(char ch)
+		{
+			
+			resize(_size+1);
+			_str[_size-1] = ch;
+		}
+		void operator+=(char ch)
+		{
+			push_back(ch);
+		}
+		void operator+=(const char *str)
+		{
+			int len = strlen(str);
+			int i = 0;
+			while (i < len)
+			{
+				push_back(*(str + i));
+				i++;
+			}
+
+		}
+		void append(int num, char ch)
+		{
+			resize(_size+num, ch);
+			
+		}
+		void append(const string &s)
+		{
+			append(s._str);
+		}
+		void append(const char *str)
+		{
+			*this += str;
+		}
+		
+		//查找
+		size_t find(char ch,size_t pos = 0)
+		{
+			int i = 0;
+			while (*(_str + pos + i) != '\0')
+			{
+				if (*(_str + pos + i) == ch)
+				{
+					return pos + i;
+				}
+				i++;
+			}
+			return npos;
+
+		}
+		size_t rfind(char ch, size_t pos = npos)        //为什么在形参列表处成员变量是随机值？
+		{
+			int index;
+			if (pos != npos)
+			{
+				index = pos;
+			}
+			else{
+				
+				index = _size;
+			}
+			while (index>=0)
+			{
+				if (_str[index] == ch)
+				{
+					return index;
+				}
+				index--;
+			}
+			return npos;
+		}
+		char * substr(size_t pos = 0,size_t n = npos) const
+		{
+			if (n == npos)
+			{
+				n = _size - pos;
+			}
+			char *str = new char[n+1];
+			int i=0;
+			while (i<n)
+			{
+				*(str + i) = *(_str + pos + i);
+				i++;
+			}
+			str[i] = '\0';
+			return str;
+		}
+		
+		size_t erase(size_t pos=0, size_t len=npos)
+		{
+			if (len == npos)
+			{
+				len = _size - pos;
+			}
+			int i = 0;
+			int num=len;
+			while (num--&&*(_str + pos + len)!='\0')
+			{
+				*(_str + pos) = *(_str + pos + len);
+				pos++;
+			}
+			_size -= len;
+			_str[_size] = '\0';
+			
+			return  pos;
+		}
+
+
+
+	private:
+		char *_str;
+		size_t _capacity=15;
+		size_t _size=0;
+		static int npos;
+	};
+	int string::npos = -1;
+	ostream& operator<<(ostream &_cout, const string &str)
+	{
+		_cout << str._str;                    //_cout就是cout
+		return _cout;
+	}
+}
+
+
+void Test(const String1::string &str)
 {
 	cout << str << endl;            //-->2
-	String3::string str1("hello");
-	String3::string str2(str1);
+	String1::string str1("hello");
+	String1::string str2(str1);
 
 }
 
 int main()
 {
-	String3::string str1("hello");
-	String3::string str2(str1);
+	String1::string str1("hello");
+	String1::string str2(str1);
 	Test(str1);
-	String3::string str3("heihei");
-	String3::string str4(str3);
+	String1::string str3("heihei");
+	String1::string str4(str3);
 	str4 = str1;
 	
 	cout << str1 << endl;
+	cout << "str1:" << str1.size() <<" "<< str1.capacity() << endl;
+	cout << str1.isEmpty() << endl;
+	str1.resize(10,'!');
+	cout << str1 << endl;
+	cout << "str1:" << str1.size() << " " << str1.capacity() << endl;
+	str1.resize(20,'?');
+	cout << str1 << endl;
+	cout << "str1:" << str1.size() << " " << str1.capacity() << endl;
+	str1.clear();
+	cout << str1 << endl;
+	cout << "str1:" << str1.size() << " " << str1.capacity() << endl;
 	cout << str2 << endl;
 	cout << str3 << endl;
+	cout << str3.find('i') << endl;
+	cout << str3.find('i',3) << endl;
+	cout << str3.rfind('i') << endl;
+	cout << str3.rfind('i',3) << endl;
+	cout << str3.substr(1,3) << endl;
+	cout << str4 << endl;
+	str4.erase(2);
 	cout << str4 << endl;
 
 
