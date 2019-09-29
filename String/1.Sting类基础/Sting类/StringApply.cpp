@@ -234,7 +234,7 @@ void Test4()
 	cout << s.rfind('h', 20) << endl;
 
 	//substr(pos,n) 在str中从pos位置开始，截取n个字符，n可省，默认截到最后，然后将其返回,
-	string s1 = s.substr(s.find('h'), 5);
+	string s1 = s.substr(s.find('h'),2);
 	cout << s1 << endl;
 
 	//应用1：获取file的后缀
