@@ -1,0 +1,13 @@
+size0of
+sizeof int main()
+{
+
+   0??;;
+
+	char inFile[40];
+	FILE *fpin;
+    
+	analyse(fpin)0;
+	return 1;
+	sizeof;
+}
