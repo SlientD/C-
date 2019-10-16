@@ -9,16 +9,23 @@ void Print(const list<T> &L)
 	
 	auto it = L.begin();
 	cout << "------------------------------" << endl;
-	/*cout << *L.end() << endl;
+	//cout << *L.end() << endl;
 	printf("%p\n", L.begin());
-	printf("%p\n", L.end());
+	printf("%p\n", L.end());    
+	printf("%p\n", *(&L.begin()));
+	printf("%p\n", *(&L.end()));//打印结果还是一样的  ？？？？？？？？？？？？？？？？？？？？？
+	                            //四个结果是一样的
+	                            //begin迭代器返回的是第一个节点的地址，end()返回的是头结点的地址，不管是返回结点所在空间的首字节地址或者_date所在空间地址，都不应该相同
+	// L.end() list_iterator<T>类型，类型里有ListNode<T>* 这样一个指针
+	//打印的是L.end() 这个对象的地址
+	//监视结果陈旧？？？？？？？？？？？？？？？
 	if (L.begin() == L.end())
 	{
 		cout << "same" << endl;
 	}
 	else{
 		cout << "diffirent" << endl;
-	}*/
+	}
 	cout << "size():" << L.size() << endl;
 
 	while (it != L.end())
@@ -31,6 +38,86 @@ void Print(const list<T> &L)
 	printf("%p\n", it);
 	
 }
+
+template <class T>
+void Print1(const list<T> &L)
+{
+
+	auto it = L.end();
+	cout << "------------------------------" << endl;
+	//cout << *L.end() << endl;
+	printf("%p\n", L.begin());
+	printf("%p\n", L.end());           
+	printf("%p\n", *(&L.begin()));
+	printf("%p\n", *(&L.end()));
+
+	if (L.begin() == L.end())
+	{
+		cout << "same" << endl;
+	}
+	else{
+		cout << "diffirent" << endl;
+	}
+	cout << "size():" << L.size() << endl;
+
+  	while (it != L.begin())         
+	{
+		it--;             //要放前用的是正向迭代器        L.end（）不能++，因为++后就访问到头节点了，头结点无值访问
+		cout << *it << ' ';
+		//it--;
+		
+		
+	}
+	cout << endl;
+	//cout << "end:" << it << endl;
+	printf("%p\n", it);
+
+}
+template <class T>
+void Print2(const list<T> &L)
+{
+
+	auto it = L.rend();            //若返回的是begin   那应该和print一样的，但是此处若是
+	cout << "------------------------------" << endl;
+
+
+	while (it != L.rbegin())       
+	{
+		it--;                              //rend返回的是begin，--内部实现其实是++，因而只能--
+		                                   
+		cout << *it << ' ';
+		/*T& operator*()
+		{
+			Iterator temp = _it;
+			--temp;
+			return *temp;
+		}*/              //*内部实现，指针又转换为正向的啦
+		
+		//it--;           //也是要放前边的，因为内部要--，你要先把指针向后移动，他才能去到这个元素地址去*取得是下一个元素
+
+	}
+	cout << endl;
+	//cout << "end:" << it << endl;
+	printf("%p\n", it);
+
+}
+template <class T>
+void Print3(const list<T> &L)
+{
+
+	auto it = L.rbegin();          //返回的是end()  
+	while (it != L.rend())
+	{
+		cout << *it << " ";
+		++it;
+	}
+
+	cout << endl;
+	//cout << "end:" << it << endl;
+	printf("%p\n", it);
+
+}
+
 bool IsOdd(int data)
 {
 	if (0 == data % 2)
