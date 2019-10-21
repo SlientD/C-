@@ -207,6 +207,24 @@ namespace MyPriorityqueue{
 				AdjustDown(i);
 			}
 		}
+		void size(){
+			return _con.size();
+		}
+		bool empty(){
+			return _con.empty();
+		}
+		void push(const T& value){
+			_con.push_back(value);
+			AdjustUP(_con.size() - 1);
+			
+
+		}
+		void pop(){
+			swap(_con.front(), _con.back());
+			_con.pop_back();
+			AdjustDown(0);
+
+		}
 
 	private:
 		void AdjustDown(int parent){
@@ -228,6 +246,21 @@ namespace MyPriorityqueue{
 				
 			}
 		}
+		void AdjustUP(int child)
+		{
+			int parent = (child - 1) / 2;
+			while (child>0){
+				if (_comp(_con[parent],_con[child]))
+				{
+					swap(_con[parent], _con[child]);
+					child = parent;
+					parent = (child - 1) / 2;			
+				}
+				else{
+					return;
+				}
+			}
+		}
 	private:
 		Contain _con;
 		Compare _comp;
@@ -239,6 +272,9 @@ namespace MyPriorityqueue{
 void Test4(){
 	deque<int> dq{ 1, 2, 3 ,5,6,2};
 	MyPriorityqueue::priority_queue<int,deque<int>,greater<int>> p1(dq.begin(),dq.end());
+	p1.pop();
+	p1.push(0);
+
 
 
 }
