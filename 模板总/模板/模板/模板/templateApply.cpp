@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include <iostream>
+
 using namespace std;
 
 
@@ -70,7 +71,7 @@ char*& MAX_T<char*>(char*& left, char*& right)
 		return right;
 	}
 }
-//但是一般都是将该函数直接给出，一是实现简单，二是因为函数模板可能会遇到不能处理或者处理有无的类型
+//但是一般都是将该函数直接给出，一是实现简单，二是因为函数模板可能会遇到不能处理或者处理有误的类型
 template <class T>
 const T& MIN_T(const T& left,const T& right)
 {
@@ -230,6 +231,7 @@ public:
 			delete[] _str;
 			_str = str;
 		}
+		return *this;
 	}
 
 	~String()
@@ -240,11 +242,90 @@ public:
 private:
 	char* _str;
 };
+
+
+/*Way1：
+//String：用该函数会报错拷贝的是地址，析构会对同一块空间释放两次，会报错
 template<class T>
 void Copy(T* dst, T* src, size_t size)
 {
-	memcpy(dst, src, sizeof(T)*size);
+memcpy(dst, src, sizeof(T)*size);
 }
+*/
+
+//因而要区分自定义和内置类型，来调用使用不同的方法进行拷贝
+/*
+//Way2：增加函数判定 区分自定义和内置类型
+bool IsPodType(const char* strType){
+	const char* arrType[] = { "char", "short", "int", "long", "long long", "float","double", "long double" };
+	for (size_t i = 0; i < sizeof(arrType) / sizeof(arrType[0]); ++i)      //每次都要遍历，效率太低！
+	{
+		if (0 == strcmp(strType, arrType[i]))
+			return true;
+	}
+	return false;
+}
+
+template<class T>
+void Copy(T* dst, T* src, size_t size)
+{
+	if (IsPodType(typeid(T).name()))
+	{
+		memcpy(dst, src, sizeof(T)*size);
+	}
+	else{
+		for (int i = 0; i < size; i++)
+		{
+			dst[i] = src[i];
+		}
+	}
+}
+*/
+
+
+//Way3:萃取类型
+struct TrueType{
+	static bool Get(){     //只有静态才能用 ::  访问
+		return true;
+	}
+};
+struct FlaseType{
+	static bool Get(){
+		return false;
+	}
+};
+template<class T>
+struct TypeTraits{
+	typedef FlaseType IsPodeType;
+};
+//对上述模板进行实例化，将内置类型都特化
+template<>
+struct TypeTraits<int>{
+	typedef TrueType IsPodeType;
+};
+template<>
+struct TypeTraits<double>{
+	typedef TrueType IsPodeType;
+};
+
+
+template<class T>
+void Copy(T* dst, T* src, size_t size)
+{
+	if (TypeTraits<T>::IsPodeType::Get())
+	{
+		memcpy(dst, src, sizeof(T)*size);
+	}
+	else{
+		for (int i = 0; i < size; i++)
+		{
+			dst[i] = src[i];
+		}
+	}
+}
+
+
+
 void TestCopy()
 {
 	int array1[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 };
@@ -252,8 +333,14 @@ void TestCopy()
 	Copy(array2, array1, 10);
 
 	String s1[3] = { "1111", "2222", "3333" };
-	String s2[3];            //拷贝的是地址，析构会对同一块空间释放两次，会报错
+	String s2[3];            
 	Copy(s2, s1, 3);
+}
+
+#include "CompilingTest.h"
+void TestCompiling()
+{
+	Add(1, 1);   //会发生报错
 }
 
 
@@ -263,7 +350,9 @@ int main(){
 	//Test3();
 	//Test4();
 	//Test5();
-	TestCopy();
+	//TestCopy();
+	TestCompiling();
+
 	system("pause");
 
 }

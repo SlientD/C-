@@ -64,7 +64,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CompilingTest.cpp" />
     <ClCompile Include="templateApply.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CompilingTest.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
