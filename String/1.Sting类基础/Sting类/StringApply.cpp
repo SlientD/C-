@@ -12,14 +12,14 @@ void Test1()
 {
 	cout << "Test1:" << endl;
 
-	string s1;       //构造一个空的string对象即空字符串，调用构造函数sting()
+	string s1;       //构造一个空的string对象即空字符串，调用构造函数string()
 	string s2("Hello string");//用c格式字符串构造string类对象，调用构造函数 sting(const char *s)
 	string s3(3, '!');       //构造string类对象，包含3个！字符，调用构造函数string(size_t n, char c)
 	string s4(s2);           //拷贝构造函数   ，调用构造函数string(const string&s)
 	cout << s2 << endl;
 	cout << s3 << endl;
 	cout << s4 << endl;     
-	//注：sting类对象支持直接使用cin或者cout进行输入和输出
+	//注：string类对象支持直接使用cin或者cout进行输入和输出
 	cin >> s1;
 	cout << s1 << endl;
 }
