@@ -231,9 +231,9 @@ void Test5()
 
 //Q6:默认构造函数
 //Q6.1构造函数
-// 如果基类的构造函数带有参数的构造函数，用户必须在
-// 派生类构造函数初始化列表的位置显式调用，以完成基类
-// 部分成员的初始化
+//在创建派生类对象时，基类必须先执行基类构造函数函数体创建基类对象，再执行派生类函数函数体构造派生类
+//先调用派生类构造函数，再调用基类构造函数（基类构造调用在派生类构造被调用之后执行基类构造函数体之前调用）
+// 如果基类的构造函数带有参数的构造函数，用户必须在派生类构造函数初始化列表的位置显式调用，以完成基类部分成员的初始化
 
 class B61{
 public:
@@ -317,8 +317,217 @@ void Test6(){
 	D63 d5(4);
 	d3 = d5;
 }
+//Q7:析构函数
+//在使用析构函数销毁对象时，先调用派生类析构函数的函数体，在函数体结束时调用基类析构函数清理基类成员
+class B71{
+public:
+
+	B71(int x){
+		_x = x;
+		cout << "有参构造B71" << endl;
+	}
+	~B71(){
+		cout << "析构函数~B71" << endl;
+	}
+	int _x;
+};
+class D71 :public B71{
+public:
+	D71(int tmp)
+		:B71(tmp)             
+	{
+		cout << "构造D71" << endl;
+	}
+	~D71(){
+		cout << "析构函数~D71" << endl;
+	}
+};
+void Test7(){
+	D71 d1(1);
+	D71 d2(d1);     //拷贝构造函数会自动生成，在已存在构造函数的前提下是不会影响默认拷贝构造的生成的，但不会在生成默认无参构造函数
+}
 
 
+//Q8.实现一个不能被继承的类
+
+//Q8.1
+class NonIherit1{
+public:
+	NonIherit1 GetInstance1()
+	{
+		return NonIherit1();
+	}
+private:
+	NonIherit1(){
+
+	}
+	NonIherit1(const NonIherit1 & tmp){
+
+	}
+};
+//这个函数被继承后，因为构造函数是私有的，在继承后，派生类的构造函数必定要通过调用基类构造来完成对象的创建，但是父类的构造函数
+//是私有的无法调用，因而实现不了继承
+class Instance1 :public NonIherit1{
+public:
+	/*Instance1()
+	                    //此处无法调用基类无参构造函数
+	{
+
+	}*/
+	//Instance1(const Instance1 &tmp)        //此处可以调用基类的拷贝构造函数来创建，但是你无法创建一个派生类，又怎么能通过拷贝构造来创建另一个派生类对象呢？
+	//	:NonIherit1(tmp)
+	//{
+	//	
+	//}	
+};
+
+//Q8.2通过上面的接口我们发现实现不了继承我们也没有办法创建NonIherit1类类对象了。。所以我们要进一步完善
+//将GetInstance1（） 这个函数变为static，就可以通过 类名加::来创建对象了
+class NonIherit2{
+public:
+	static NonIherit2 GetInstance2()        //返回值为NonIherit2，也通过调用拷贝构造来创建对象了
+	{
+		return NonIherit2();
+	}
+private:
+	NonIherit2(){
+
+	}
+	/*NonIherit2(const NonIherit2 & tmp){
+
+	}*/
+};
+
+//Q8.3 C++11中给出了新的关键字final来修饰类，表示该类无法继承
+class NonIherit3 final
+{
+
+};
+/*
+class Instance3 :public NonIherit3{    //会提示报错信息，NonIherit3无法继承
+
+}
+*/
+
+void Test8(){
+	NonIherit2 x=NonIherit2::GetInstance2();
+}
+
+//Q9.继承与友元
+//友元函数不能继承，即基类的友元不能访问子类的私有和保护成员
+//很好理解，之前说友元函数不属于任意一个类，只要那个类声明了该函数，该函数就是这个类的友元,不属于父类的东西子类自然也无法继承
+class D91;
+class B91{
+public:
+	B91(int val)
+	:_b(val)
+	{
+
+    }
+	friend void display(const B91 &btmp,const D91 &dtmp);
+private:	
+	int _b;
+};
+
+class D91:public B91{
+public:
+	D91(int val1,int val2)
+	:B91(val1)
+	,_d(val2)
+	{
+
+	}
+private:
+	int _d;
+};
+void display(const B91 &btmp, const D91 &dtmp){
+	cout << btmp._b << endl;
+	//cout << dtmp._d << endl;    //报错显示_d不可访问
+}
+#if 0     //模板加友元思考
+class D92;
+class B92{
+public:
+	B92(int val)
+		:_b(val)
+	{
+
+	}
+	template <class T>
+	friend void display2(T &btmp);
+private:
+	int _b;
+};
+
+//class D92 :public B92{
+//public:
+//	D92(int val1, int val2)
+//		:B92(val1)
+//		, _d(val2)
+//	{
+//
+//	}
+//private:
+//	int _d;
+//};
+template <class T>
+void display2(T &btmp){
+	cout << btmp._b << endl;
+	//cout << dtmp._d << endl;    //报错显示_d不可访问
+}
+
+#endif
+void Test9()
+{
+	B91 X(2);
+	D91 Y(1,2);
+	display(X, Y);
+	//B92 x(2);
+	//display2(x);
+}
+
+
+//Q10:继承与静态成员：
+//基类定义一个static静态成员，不管被几个子类继承，都只有一个static成员，父类和所有子类共用这个变量
+class B10{
+public:
+	static int t;
+};
+int B10::t = 1;
+class D101 :public B10{
+public:
+	D101(){
+		t++;
+    }
+
+};
+class D102 :public B10{
+public:
+	D102(){
+		t++;
+	}
+
+};
+class D103 :public D101{
+public:
+	D103()
+	{
+		t++;
+	}
+};
+void Test10()
+{
+	B10 b1;
+	D101 d1;
+	D102 d2;
+	D103 d3;
+	cout << B10::t << endl;
+	cout << D101::t << endl;
+	cout << &b1.t << endl;
+	cout << &d1.t << endl;
+	cout << &d2.t << endl;
+	cout << &d3.t << endl;      //输出地址一样
+}
 
 int main()
 {
@@ -328,5 +537,9 @@ int main()
 	//Test3();
 	//Test4();
 	//Test5();
-	Test6();
+	//Test6();
+	//Test7();
+	//Test8();
+	//Test9();
+	Test10();
 }
