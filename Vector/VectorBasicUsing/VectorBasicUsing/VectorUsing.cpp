@@ -109,7 +109,7 @@ int main()
 
 	v5.swap(v2);          //交换两个vector的数据空间   
 	swap(v5, v2);         //当然可也以这么写，不调用成员函数，但是推荐上面的写法，因为这种写法必定要创建临时变量，效率不如上面的高
-
+	
 
 
 	//迭代器失效问题：
@@ -138,6 +138,8 @@ int main()
 		it++;
 	}
 	cout << endl;
+
+	
 
 	//erase也会使其失效
 	auto pos1 = find(v.begin(), v.end(), 3);

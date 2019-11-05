@@ -24,7 +24,7 @@ void Test1()
 	cout << s1 << endl;
 }
 
-//Q2:sting 类对象的容量操作：
+//Q2:string 类对象的容量操作：
 void Test2()
 {
 	cout << "Test2:" << endl;
@@ -260,6 +260,7 @@ void Test4()
 	cout << s << endl;
 	s.erase(20);
 	cout << s << endl;
+	s.insert('c', 2, 2);
 }
 
 
