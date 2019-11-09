@@ -56,7 +56,7 @@ int main()
 	while (cin >> num)
 	{
 		vector<int> team(num * 3);
-		long sum = 0;
+		long long sum = 0;            //
 		for (int i = 0; i<num * 3; i++)
 		{
 			cin >> team[i];
