@@ -414,13 +414,13 @@ public:
 
 	}
 	virtual void Test1(){
-
+		cout << "B63::Test1()" << endl;
 	}
 	virtual void Test2(){
-
+		cout << "B63::Test2()" << endl;
 	}
 	virtual void Test3(){
-
+		cout << "B63::Test3()" << endl;
 	}
 	void Test4(){
 
@@ -438,10 +438,10 @@ public:
 
 	}
 	virtual void Test1(){
-
+		cout << "D63::Test1()" << endl;
 	}
 	virtual void Test2(){
-
+		cout << "D63::Test2()" << endl;
 	}
 	
 	int x;
@@ -463,6 +463,7 @@ void PrintTable(B63 & b, const string& str)
 	while (*p)
 	{
 		cout<<*p<<endl;
+		(*p)();       //调用所p指向的函数
 		++p;
 
 	}
@@ -526,7 +527,7 @@ void Test7(){
 //                                  有几个基类有虚函数，派生类就要生成相应多的虚函数表指针来指向虚函数表
 //                   重写那个基类的虚函数，就找到类中对应的虚函数表指针再结合偏移量替换虚函数表中的入口地址
 //                   派生类中的再加的虚函数，按声明顺序将函数入口地址放到第一个虚表之后
-class B81{
+class B81{            //占8个字节
 public:
 	virtual void Test1(){
 
@@ -536,7 +537,7 @@ public:
 	}
 	int b1;
 };
-class B82{
+class B82{                  //占8个字节
 public:
 	virtual void Test2(){
 
@@ -546,29 +547,32 @@ public:
 	}
 	int b2;
 };
-class D81 :public B81, public B82{
-public:
-	virtual void Test3()override{
+class D81 :public B81, public B82{    //8  8                                   
+public:                                                                      
+	virtual void Test3()override{         
+																			  
+	}																			
+	virtual void Test4(){            //放在第一张虚表之后                     
 
 	}
-	virtual void Test4(){
-
-	}
-	int b3;
+	int b3;             //-->4
 };
+
+//内存布局
+//继承B81后的新创建表的虚表指针   （--》派生类新建一个虚函数表存放B81虚表中的内容, 派生类后加的虚函数最后也在这张表中）
+//B81成员变量                     B81成员内容
+//继承B81后的新创建表的虚表指针    （--》派生类新建一个虚函数表存放B82虚表中的内容）
+//B82成员变量
+//派生类的成员变量
+
 
 void Test8(){
 	D81 d1;
-	cout<<sizeof(d1)<<endl;
+	cout<<sizeof(d1)<<endl;     //8 8 4   -->20
 }
 
-
-
-
-
-
-
-
+//Q9.inline函数不可以是虚函数--》因为inline没有函数地址，而虚函数在虚函数表里存的就是函数地址，因而不能讲他们放到一起使用
+//   static成员函数也不可以是虚函数-->因为static成员函数中没有this指针，而对象访问虚函数表需要this指针来看他的使用类型::成员函数的调用方式无法访问虚函数表，也就不能通过这个办法找到函数入口地址
 
 
 
