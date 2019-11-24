@@ -260,7 +260,8 @@ void Test4()
 	cout << s << endl;
 	s.erase(20);
 	cout << s << endl;
-	s.insert('c', 2, 2);
+	s.insert( 0, 1,'c');
+	cout << s << endl;
 }
 
 
