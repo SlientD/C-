@@ -3,6 +3,18 @@
 #include <vector>
 using namespace std;
 
+void change(int arr1[]){
+	arr1[0] = 10;
+}
+
+int main(){
+	int arr[] = { 1, 2, 3 };
+	change(arr);
+	
+}
+
+
+#if 0
 int main(){
 	vector<int> left{ 1, 2, 0, 1, 3, 1 };
 	vector<int> right{ 0, 0, 0, 2, 0, 1 };
@@ -38,7 +50,7 @@ int main(){
 	cout << sum << endl;
 	system("pause");
 }
-
+#endif
 #if 0
 int main(){
 	char str[] = "abcdef";
