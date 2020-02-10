@@ -54,6 +54,9 @@ public:
 
 private:
 	void GenerateCode(HuffManTreeNode<CharInfo> * root);
+	void WriteHead(FILE * fIn, const string &path);
+	string GetPostFix(const string &str);
+	void GetLine(FILE *file, string &str);
 private:
 	vector<CharInfo> character;         
 	//CharInfo* character;//在堆内开辟一整段空间，每个空间存放一个的结构体变量
