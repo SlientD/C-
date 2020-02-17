@@ -24,7 +24,7 @@ void FileCompressHuff::GenerateCode(HuffManTreeNode<CharInfo> * root){
 
 void FileCompressHuff :: CompressFile(const string &path){
 	//1.打开文件
-	FILE *fd = fopen(path.c_str(), "rb");      //第一个参数是字符串类型的
+	FILE *fd = fopen(path.c_str(), "rb");      //第一个参数是字符串类型的   为什么以二进制形式读？因为文本文件FF会系统会以为是读到了文件末尾
 	if (fd == nullptr){
 		assert(false);
 		return;
@@ -35,7 +35,7 @@ void FileCompressHuff :: CompressFile(const string &path){
 		character[i].ch = i;   //数组下标就是存放字母的asc值
 		character[i].count = 0;
 	}
-	char buff[1024] ;
+	unsigned char buff[1024] ;
 	int readSize = 0;
 	while (1){
 		memset(buff, 0, 1024);
@@ -64,7 +64,7 @@ void FileCompressHuff :: CompressFile(const string &path){
 
 	WriteHead(fOut, "2.txt");
 	string tmpCode;
-	char ch=0;
+	unsigned char ch=0;
 	int count = 0;
 	fseek(fd, 0,SEEK_SET);       //因为之前统计字符个数时，文件指针已经到末尾了，所以我们现在要重新设置文件指针到文件开头重新读
 	while (1){
@@ -138,7 +138,7 @@ void FileCompressHuff::WriteHead(FILE * fIn, const string &path){
 }
 void FileCompressHuff::GetLine(FILE *file, string &str){
 	assert(file);
-	char ch;
+	unsigned char ch;
 	while (!feof(file)){
 		ch = fgetc(file);
 		if (ch == '\n')
@@ -147,7 +147,7 @@ void FileCompressHuff::GetLine(FILE *file, string &str){
 	}
 }
 void FileCompressHuff::UnCompressFile(const string &path){
-	FILE *fIn = fopen(path.c_str(), "r");
+	FILE *fIn = fopen(path.c_str(), "rb");
 	assert(fIn);
 	character.resize(256);
 	for (int i = 0; i < 256; i++){
@@ -163,11 +163,19 @@ void FileCompressHuff::UnCompressFile(const string &path){
 	GetLine(fIn, SLineCount);
 	int LineCount = atoi(SLineCount.c_str());
 	//1.3字符信息
-	
+	int total = 0;
 	for (int i = 0; i < LineCount; i++){
 		string ch;
 		GetLine(fIn, ch);
-		character[ch[0]].count = atoi(ch.c_str() + 2);
+		//当字符为‘\n\r’时    按下enter键是回车换行
+		if (ch.empty()){
+			ch += "\n";
+			GetLine(fIn, ch);
+			
+
+		}
+		character[(unsigned char)ch[0]].count = atoi(ch.c_str() + 2);    //ch[0]可能太大变为负数，变得无效  string存的字符都是char类型的
+		total += character[(unsigned char)ch[0]].count;
 	}
 	//2.还原Huffman树
 	HuffManTree<CharInfo> ft(character, CharInfo(0));
@@ -177,24 +185,24 @@ void FileCompressHuff::UnCompressFile(const string &path){
 	HuffManTreeNode<CharInfo> Node;
 	HuffManTreeNode<CharInfo> *pCur=ft.GetRoot();
 	assert(fOut);
-	char buff[1024];
+	unsigned char buff[1024];
 	string Instr;
-	char tmp;
+
+
 	while (1){
 		memset(buff, 0, sizeof(buff));
 		int read = fread(buff, 1, 1024, fIn);
 		if (0 == read){
 			break;
 		}
-		int i = 0;
-		while (read--){
-			for (int j = 0; j < read; j++){
-				tmp=
-				for (int i = 0; i < 8; i++){
-					if (1 == buff[j] & 0x80){
+		for (int cpos = 0; cpos < read; cpos++){
+				
+				for (int inpos = 0; inpos < 8; inpos++){
+					
+					if (1 == (buff[cpos] & 0x80) >> 7){
 						pCur = pCur->left;
 					}
-					else if (0 == buff[j] & 0x80){
+					else if (0 == (buff[cpos] & 0x80) >> 7){
 						pCur = pCur->right;
 					}
 					else{
@@ -202,15 +210,18 @@ void FileCompressHuff::UnCompressFile(const string &path){
 						return;
 					}
 					if (pCur->left == nullptr&&pCur->right == nullptr){
+						if (total == 0)
+							break;
 						Instr += pCur->weight.ch;
 						pCur = ft.GetRoot();
+						total--;
 					}
-					buff[i] <<= 1;
+					buff[cpos] <<= 1;
 				}
 			}
 			
 			
-		}
+		
 
 	}
 	fwrite(Instr.c_str(), Instr.size(), 1, fOut);

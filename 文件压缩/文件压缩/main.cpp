@@ -12,7 +12,7 @@
 int main(){
 	//TestHuffManTree();
 	FileCompressHuff fc;
-	//fc.CompressFile("testcom.txt");
+	fc.CompressFile("testcom.cpp");
 	fc.UnCompressFile("2.txt");
 	return 0;
 }

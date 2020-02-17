@@ -46,7 +46,6 @@ public:
 		//构建森林
 		//按大小顺序排好
 		priority_queue<Node *,vector<Node *>,Less<T>> q;
-		//priority_queue<Node *> q;      //不应该按照权值来堆排吗？？？这是按照地址来进行堆排把？？？？
 		for (auto e : v){             //后面的操作不会改变v中的值，只会改变哈夫曼树的值，对于code的生成也只是改变了哈夫曼树中结点成员的值
 			if (e == invalid)
 				continue;

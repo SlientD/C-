@@ -16,20 +16,21 @@ typedef struct CharInfo{        //存放每个字符的信息
 	{
 
 	}
-	char ch;
-	string code;     //编码
-	size_t count;   //字符个数
 
 	CharInfo operator+(CharInfo & x){
-		return CharInfo(count + x.count);   //权值是一个charinfo结构体，这里创建的结构体只有count，其他两个属性没有值？？奇怪哦
+		return CharInfo(count + x.count);   //权值是一个charinfo结构体，这里创建的结构体只有count，其他两个属性没有值？？   可以没有用到啥保存啥就可以
 	}
-	bool operator>(const CharInfo & x)const{   
+	bool operator>(const CharInfo & x)const{
 		return count > x.count;
 	}
-	
+
 	bool operator==(const CharInfo & x){
 		return count == x.count;
 	}
+	unsigned char ch;                //Q1>>>一共256个字符，如果是char的范围是-128~127   之后的没有办法表达
+	string code;     //编码
+	size_t count;   //字符个数
+
 	
 	
 	
