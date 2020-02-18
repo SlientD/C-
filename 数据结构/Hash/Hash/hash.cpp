@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS 1
-#include <vector>
-#include <iostream>
+
+#include "hash.hpp"
 using namespace std;
 
 //代码缺陷，不针对所有元素类型
@@ -13,38 +13,78 @@ struct Elem{
 	Elem(){
 		_state = EMPTY;
 	}
-	int _data;
+	T _data;
 	STATE _state;
 };
 
+//让一个类的对象可以让他按照函数的方式来进行调用
 template <class T>
+class DFDef{
+public:
+	T operator()(const T& data){
+		return data;
+	}
+};
+
+
+class DFStr{
+public:
+	size_t operator()(const string& str){
+		return BKDRHash(str.c_str());
+	}
+private:
+	size_t BKDRHash(const char *str){
+		register size_t hash = 0;
+		while (size_t ch = (size_t)*str++){
+			hash = hash * 131 + ch;
+		}
+		return hash;
+	}
+};
+
+
+//T:代表元素类型，   DF:将T类型转换为整数数据方法的类型
+//IsLine表示按照线性还是二次冲突处理
+template <class T, class DF = DFDef<T>, bool IsLine = true>
 class HashTable{
 public:
-	HashTable(const vector<T> & v, size_t capacity=11)
+	HashTable(size_t capacity=10)
 		:_size(0)
 		, _capacity(capacity)
 	{
-		_table.resize(_capacity);
-		for (int i = 0; i < v.size(); i++){
-			Insert(v[i]);
-		}
+		_table.resize(GetNextPrime(capacity));
+		
+		
 	}
 	bool Insert(const T& data){
+		CheckCapacity();
 		//1.通过哈希函数，计算哈希地址
 		size_t hashAddr = HashFunc(data);
 		//2.找合适位置
-		while (_table[hashAddr]._state != EMPTY){
+		int i = 0;
+		while (_table[hashAddr]._state == EXIST){    
 			if (_table[hashAddr]._state == EXIST&&_table[hashAddr]._data == data){
 				return false;
 			}
+			
 			//线性探测
-			hashAddr++;
-			//方式一
-			//hashAddr %= _table.capacity();  //每次都要计算pass掉
-			//方式二：
-			if (hashAddr == _table.capacity()){
-				hashAddr = 0;
+			if (IsLine){
+				hashAddr++;
+				//方式一
+				//hashAddr %= _table.capacity();  //每次都要计算pass掉
+				//方式二：
+				if (hashAddr == _table.capacity()){
+					hashAddr = 0;
+				}
 			}
+			
+			//二次线性探测
+			else{
+				i++;
+				hashAddr = (hashAddr + 2 * i + 1) % _table.capacity();
+			}
+			
+			
 		}
 		//找到了一个空位置，插入元素
 		_table[hashAddr]._data = data;
@@ -83,10 +123,31 @@ public:
 	int size(){
 		return _size;
 	}
-
+	void Swap(HashTable<T, DF, IsLine>& ht){
+		_table.swap(ht._table);//比下面的交换效率高，在里面的实现是交换了start、finish，end_of_storage指针
+		swap(_size, ht._size);
+		_capacity = _table.capacity();
+	}
 private:
+	void CheckCapacity(){
+
+		if (_size * 10 / _table.capacity() == 7){
+			//重新创建一个哈希表，将旧哈希表状态为存在的元素向新哈希表格中插入
+			
+			
+			//1.新创一个哈希表
+			HashTable<T, DF, IsLine> newHT(GetNextPrime(_table.capacity()));
+			//2.将旧哈希表中的状态为存在的元素向新哈希表格中插入
+			for (auto e : _table){
+				if (e._state == EXIST)
+					newHT.Insert(e._data);
+			}
+			Swap(newHT);
+		}
+	}
 	int HashFunc(const T & data){
-		return data % 11;
+
+		return (DF()(data)) % 11;
 	}
 
 
@@ -99,19 +160,4 @@ private:
 
 };
 
-void TestHashTable(){
-	vector<int> arr { 21, 67, 112, 99, 5, 13, 44 };
-	HashTable<int> hash(arr);
 
-	cout << hash.size() << endl;
-	hash.Insert(87);
-	cout << hash.size() << endl;
-	hash.Erase(44);
-	cout << hash.size() << endl;
-}
-
-int main(){
-	TestHashTable();
-	system("pause");
-	return 0;
-}
