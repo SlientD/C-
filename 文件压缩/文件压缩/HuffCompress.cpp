@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include "HuffCompress.hpp"
 #include "Hufftree.hpp"
-#include <assert.h>
+
 void FileCompressHuff::GenerateCode(HuffManTreeNode<CharInfo> * root){
 	if (root == nullptr)
 		return;

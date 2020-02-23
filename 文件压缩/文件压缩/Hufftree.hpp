@@ -1,10 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #pragma once
-#include <iostream>
-#include <vector>
-#include <queue>
-//#include "HuffCompress.hpp"
-using namespace std;
+#include "common.hpp"
 
 template <class T>
 struct HuffManTreeNode

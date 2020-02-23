@@ -1,9 +1,5 @@
 #pragma once
-#include <string>
-#include <vector>
-#include <iostream>
-#include "Hufftree.hpp"
-using namespace std;
+#include "common.hpp"
 
 
 typedef struct CharInfo{        //存放每个字符的信息
