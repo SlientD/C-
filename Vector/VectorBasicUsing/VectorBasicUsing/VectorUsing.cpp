@@ -12,6 +12,13 @@ int main()
 	//Q1.构造方法
 	cout << "构造方法" << endl;
 	vector<int> v1;        //vector()
+	cout << v1.size() << endl;
+	v1.push_back(3);
+	cout << v1.size() << endl;
+	system("pause");
+
+
+
 	vector<int> v2(4);  //vector (n,m);  构造并初始化n个m,m默认为0
 	vector<int> v3(v2);     //vector (const vector &x);  拷贝构造
 	vector<int> v4(v3.begin(), v3.begin() + 2); //迭代器构造，从开始到结尾
