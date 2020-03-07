@@ -21,12 +21,63 @@ struct HushNode{
 	T _data;
 	HushNode<T> *_next;
 };
+template <class T, class DF = DFDef<T>>
+class HashBucket ;
+//迭代器   原生态指针   对原生态指针进行封装 
 
+template <class T, class DF = DFDef<T>>
+struct HBIterator
+{
+	typedef HushNode<T> Node;
+	HBIterator(Node *pNode,HashBucket<T,DF> *hb){
+		_pNode = pNode;
+		_hb = hb;
+	}
+	//具有指针类似的操作
+	//能够移动
+	//前置++
+	//后置+++
+	//比较
+	bool operator!=(Node &s){
 
+	}
+	bool operator==(Node &s){
+
+	}
+	void Next(){
+		if (_pNode->_next){
+			//_pNode对应的链表后序还有节点
+			_pNode = _pNode->_next;
+		}
+		else{
+			//_pNode是所在链上的最后一个节点
+			//要找_pNode后序的第一个非空的桶
+			//如何知道pnode在哪个桶中？如果拿到哈希函数就可以，怎么拿到哈希函数呢？在维护一个哈希表啊
+			size_t bucketNo = _ht->HashFunc();
+			for (; bucketNo < _ht->table.cap(); ++bucketNo){
+				if (_ht->table[bucketNo]){
+					//非空桶已找到
+					_pNode = _ht->table[bucketNo];
+					return;
+				}
+				_pNode = nullptr;
+			}
+		}
+	}
+	Node * _pNode;
+	HashBucket<T, DF> *_hb;
+};
+//迭代器如何与类结合？
+// 1.为该类定义迭代器
+// 2.在类中重新给迭代器命名
+// 3/增加begin end接口
 template <class T,class DF=DFDef<T>>
 class HashBucket{
-public:
 	typedef HushNode<T> Node;
+	friend class HBIterator<T, DF>;
+	typedef HBIterator<T, DF> iterator;
+public:
+
 	HashBucket(size_t capa=10)
 	:_size(0)
 	{
@@ -158,6 +209,18 @@ public:
 			pCur = pCur->_next;
 		}
 		return nullptr;
+	}
+	iterator begin(){
+		//找第一个非空桶
+		for (size_t bucket = 0; bucket < _table.size();bucket++){
+			if (_table[bucket])
+				return iterator(_table[bucket], this);
+
+		}
+		return end();
+	}
+	iterator end(){
+		return iterator(nullptr, this);
 	}
 
 
