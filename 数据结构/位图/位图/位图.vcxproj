@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{4C6993F7-E048-4B37-B006-F3E1F1A1C185}</ProjectGuid>
-    <RootNamespace>Find—Max—ip</RootNamespace>
+    <ProjectGuid>{AF094448-A5FC-4E96-BFE9-21C003CD4DDE}</ProjectGuid>
+    <RootNamespace>位图</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -64,6 +64,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BitSetAccomplish.h" />
+    <ClInclude Include="BitSetTest.hpp" />
+    <ClInclude Include="common.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
