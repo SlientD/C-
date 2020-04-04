@@ -22,15 +22,123 @@ struct RBtreeNode
 	RBtreeNode *_right;
 };
 
+//迭代器
+template<class T>
+struct RBIterator{
+	typedef RBtreeNode<T> Node;
+	typedef RBIterator<T> Self;
+	RBIterator(Node *pNode = nullptr)
+		:_pNode(pNode)
+	{
+	}
+
+	//具有类似指针的操作
+	T& operator*(){
+		return _pNode->_val;
+	}
+	T* operator->(){
+		return &(_pNode->_val);
+	}
+
+	//可以移动
+	Self& operator++(){
+		Increase();
+		return *this;
+	}
+
+	Self operator++(int){
+		Self tmp(_pNode);
+		Increase();
+		return tmp;
+
+	}
+	Self& operator--(){
+		DeIncrease();
+		return *this;
+	}
+
+	Self operator--(int){
+		Self tmp(_pNode);
+		DeIncrease();
+		return tmp;
+
+	}
+	void Increase(){
+		if (_pNode->_right){
+			_pNode = _pNode->_right;
+			while (_pNode->_left){
+				_pNode = _pNode->_left;
+			}
+		}
+		else{
+
+			Node *parent = _pNode->_parent;
+			while (_pNode == parent->_right){
+				_pNode = parent;
+				parent = parent->_parent;
+			}
+			//防止特殊情况：根节点没有右子树
+			if (_pNode->_right != parent){
+				_pNode = parent;
+			}
+		}
+	}
+	void DeIncrease(){
+		//如果_pnode在end的位置   满足第一个条件可能是头结点也可能是根节点
+		if (_pNode->_parent->_parent == _pNode&&_pNode->_col == RED){
+			_pNode = _pNode->_right;
+			return;
+		}
+		//左子树存在，找左子树中最大的（左子树最右侧的）
+		if (_pNode->_left){
+			_pNode = _pNode->_left;
+			while (_pNode->_right){
+				_pNode = _pNode->_right;
+			}
+		}
+		else{
+			Node *parent = _pNode->_parent;
+			while (_pNode == parent->_left){
+				_pNode = parent;
+				parent = parent->_parent;
+			}
+			//防止特殊情况：根节点没有左子树
+			if (_pNode->_left != parent){
+				_pNode = parent;
+			}
+		}
+	}
+	//可作比较
+	bool operator==(const Self &s)const{
+		return _pNode == s._pNode;
+	}
+	bool operator!=(const Self &s)const{
+		return _pNode != s._pNode;
+	}
+
+
+	Node *_pNode;
+};
+
+
+
 template <class T>
 class RBtree{
 	typedef RBtreeNode<T> Node;
+public:
+	typedef RBIterator<T> Iterator;
 public:
 	RBtree(){
 		_phead = new Node;
 		_phead->_left = _phead;
 		_phead->_right = _phead;
 		_size = 0;
+	}
+	Iterator begin(){
+		return Iterator(_phead->_left);
+	}
+	Iterator end(){
+		return Iterator(_phead);
 	}
 	bool insert(const T &data){
 		Node* pRoot = getRoot();
@@ -293,6 +401,18 @@ void TestRBTree(){
 	for (auto e : a){
 		t.insert(e);
 	}
-	cout<<t.isVaildRBTree()<<endl;
+	auto it = t.begin();
+	while (it != t.end()){
+		cout << *it << "  ";
+		it++;
+	}
+	cout << endl;
+	while (it != t.begin()){
+		it--;
+		cout << *it << "  ";
+	}
+	cout << endl;
+
+	cout << t.isVaildRBTree() << endl;
 	cout << true << endl;
 }
